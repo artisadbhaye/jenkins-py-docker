@@ -1,0 +1,71 @@
+pipeline {
+	agent any
+	environment {
+			GIT_REPOSITORY_URL='https://github.com/artisadbhaye/jenkins-py.git'
+			DOCKER_IMAGE_NAME='Jenkins-docker'
+			IMAGE_TAG = '1.0'
+			DOCKER_USERNAME = 'aartisadbhaye1'
+			DOCKER_PASSWORD = 'ditiss@123'
+	}
+	stages {
+		stage('clone repo') {
+			steps {
+				script {
+					try {
+						git branch: 'master', url: GIT_REPOSITORY_URL
+					} catch (Exception e) {
+						echo "Failed to clone repo: ${e.message}"
+						echo "Failed to clone repo"
+					}
+
+				}
+
+			}
+		}
+		stage('build image') {
+			steps {
+				script {
+					try {
+						docker.build('${DOCKER_IMAGE_NAME}:${IMAGE_TAG}')
+					} catch(Exception e) {
+						echo "could not build image: ${e.message}
+					}
+				}
+			}
+		}
+		stage('push image to docker hub') { 
+                        steps { 
+                                script {
+					try {
+                                                withCredentials([usernamePassword(credentialsId: 'ditiss-docker', usernameVariable: 'aartisadbhaye1', passwordVariable: 'ditiss@123')]) {
+							//Explicit login before push
+							sh """
+							echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_USERNAME --password-stdin
+							docker push ${DOCKER_IMAGE_NAME}:${IMAGE_TAG}
+							"""
+						}
+                                        } catch (Exception e) {
+                                                echo "Failed to PUSH docker image to registry ${e.message}"
+                                                echo "Failed to push docker image"
+                                        }
+
+                                }
+                        }
+                }
+
+		stage('execute file') {
+			steps {
+				script {
+				try {
+					sh """
+					python3 hello.py
+					"""
+				} catch(Exception e) {
+					echo "Could not run sorry: ${e.message}"
+					echo "Could not run"
+				}
+				}
+			}
+		}
+	}
+}
