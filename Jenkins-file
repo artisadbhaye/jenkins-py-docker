@@ -2,7 +2,7 @@ pipeline {
 	agent any
 	environment {
 			GIT_REPOSITORY_URL='https://github.com/artisadbhaye/jenkins-py.git'
-			DOCKER_IMAGE_NAME='Jenkins-docker'
+			DOCKER_IMAGE_NAME='aartisadbhaye1/jenkins_docker_py'
 			IMAGE_TAG = '1.0'
 			DOCKER_USERNAME = 'aartisadbhaye1'
 			DOCKER_PASSWORD = 'ditiss@123'
